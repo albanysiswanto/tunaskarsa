@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1038468929760",
+    "project_id": "tunaskarsa-5246b",
+    "storage_bucket": "tunaskarsa-5246b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1038468929760:android:493917a8a109db8d0cd885",
+        "android_client_info": {
+          "package_name": "com.example.tunaskarsa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBlqY5Iq8yv98esFICRdDfq4yHRoPaj58"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
