@@ -1,10 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:tunaskarsa/pages/biodataUser_page.dart';
 import 'package:tunaskarsa/pages/dashboard_page.dart';
 import 'package:tunaskarsa/pages/login_page.dart';
 
 class AuthService {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> signup({
     required String email,
@@ -45,23 +49,32 @@ class AuthService {
   Future<void> signin({
     required String email,
     required String password,
-    required BuildContext context
-  }) async{
-    try{
+    required BuildContext context,
+  }) async {
+    try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
-        password: password
-        );
-        await Future.delayed(const Duration(seconds: 1));
+        password: password,
+      );
+      await Future.delayed(const Duration(seconds: 1));
+
+      final isComplete = await AuthService().checkUserData();
+      if (isComplete) {
         Navigator.pushReplacement(
-          context, 
-          MaterialPageRoute(builder: (BuildContext context) => DashboardPage())
+          context,
+          MaterialPageRoute(builder: (context) => DashboardPage()),
         );
-    } on FirebaseAuthMultiFactorException catch(e){
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => BiodataPage()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
       String message = '';
-      if(e.code == 'user-not-found'){
+      if (e.code == 'user-not-found') {
         message = 'Email atau user tidak ditemukan.';
-      }else if(e.code == 'wrong-password'){
+      } else if (e.code == 'wrong-password') {
         message = 'Anda memasukan password yang salah.';
       }
       Fluttertoast.showToast(
@@ -70,11 +83,10 @@ class AuthService {
         gravity: ToastGravity.SNACKBAR,
         backgroundColor: Colors.black54,
         textColor: Colors.white,
-        fontSize: 14.0
-        );
-    }
-     catch(e){
-
+        fontSize: 14.0,
+      );
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -87,6 +99,18 @@ class AuthService {
       context,
       MaterialPageRoute(builder: (BuildContext context) => LoginPage())
       );
+  }
+
+  Future<bool> checkUserData() async{
+    final user = _auth.currentUser;
+
+    if(user != null){
+      final userDoc = await _firestore.collection('Users').doc(user.uid).get();
+      if(userDoc.exists){
+        return userDoc['isBiodataComplete'] ?? false;
+      }
+    }
+    return false; // data null atau user belum login
   }
 
 }
